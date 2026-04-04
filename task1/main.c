@@ -23,7 +23,7 @@ int partition(int* arr, int low, int high)
 {
     int pivot = arr[high];
     int i = low - 1;
-    for (int j = low; j <= high; ++j)
+    for (int j = low; j < high; ++j)
     {
         if (arr[j] <= pivot)
         {
@@ -59,8 +59,7 @@ void* parallelQuickSort(void* args) // take args from thread
 
     if (left >= right) 
     {
-        printf("left >= right\n");
-        exit(0);
+        return NULL;
     }
 
     if (max_threads <= 1 || (right - left + 1) < THRESHOLD) 
@@ -106,37 +105,44 @@ void DivideAndRule(int* arr, int size, int count_of_threads)
 int main(int argc, char** argv)
 {
 
-    int count_of_threads = 0;
-    if (argc != 2)
+    if (argc < 2)
     {
         perror("incorrect count of arguements. must be 2\n");
         exit(1);
     }
-    else
+
+
+    int count_of_threads = 0;
+    
+
+    count_of_threads = atoi(argv[1]);
+    if (count_of_threads < 0) 
     {
-        count_of_threads = atoi(argv[1]);
-        if (count_of_threads < 0) 
-        {
-            perror("incorrect count of threads!\n");
-            exit(1);
+        perror("incorrect count of threads!\n");
+        exit(1);
+    }
+
+    int capacity = 10;
+    int size = 0;
+    int* arr = malloc(capacity * sizeof(int));
+
+    int num;
+
+        while (scanf("%d", &num) == 1) {
+        if (size >= capacity) {
+            capacity *= 2;
+            arr = realloc(arr, capacity * sizeof(int));
         }
+        arr[size++] = num;
     }
 
+    if (size > 0) {
+        DivideAndRule(arr, size, count_of_threads);
 
-    int size = argc - 2;
-
-    int* arr = malloc(size * sizeof(int));
-
-    for (int i = 0; i < size; ++i)
-    {
-        arr[i] = atoi(argv[2][i + 1]);
-    }
-
-    DivideAndRule(arr, size, count_of_threads);
-
-    for (int i = 0; i < size; ++i)
-    {
-        printf("%d ", arr[i]);
+        for (int i = 0; i < size; ++i) {
+            printf("%d ", arr[i]);
+        }
+        printf("\n");
     }
 
     free(arr);
