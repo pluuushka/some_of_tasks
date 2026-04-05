@@ -10,7 +10,7 @@ int has_any_char(const char* s)
 {
     while (*s)
     {
-        if (isgrapgh((usigned char)*s))
+        if (isgraph((char)*s))
         {
             return 1;
         }
@@ -20,8 +20,20 @@ int has_any_char(const char* s)
     return 0;
 }
 
+int cmp_plain(const void *a, const void *b) {
+    return strcmp(*(const char**)a, *(const char**)b);
+}
+int cmp_lex(const void *a, const void *b) {
+    return strcasecmp(*(const char**)a, *(const char**)b);
+}
+int cmp_rplain(const void *a, const void *b) {
+    return strcmp(*(const char**)b, *(const char**)a);
+}
+int cmp_rlex(const void *a, const void *b) {
+    return strcasecmp(*(const char**)b, *(const char**)a);
+}
 
-int main(int argc, char *argv)
+int main(int argc, char **argv)
 {
     if (argc != 4)
     {
@@ -64,10 +76,47 @@ int main(int argc, char *argv)
                 exit(1);
             }
             strcpy(lines[count], buffer);
-            counnt++;
+            count++;
         }
     }
 
     fclose(fin);
+
+    if (strcmp(mode, "plain") == 0)
+    {
+        qsort(lines, count, sizeof(char*), cmp_plain);
+    }
+    else if (strcmp(mode, "lex") == 0)
+    {
+        qsort(lines, count, sizeof(char*), cmp_lex);
+    }
+    else if (strcmp(mode, "rplain") == 0)
+    {
+        qsort(lines, count, sizeof(char*), cmp_rplain);
+    }
+    else if (strcmp(mode, "rlex") == 0)
+    {
+        qsort(lines, count, sizeof(char*), cmp_rlex);
+    }
+    else 
+    {
+        perror("incorrect mode");
+        exit(1);
+    }
+
+    FILE *fout = fopen(outfile, "w");
+    if (!fout) 
+    {
+        perror("fopen output");
+        exit(1);
+    }
+    for (int i = 0; i < count; i++) 
+    {
+        fprintf(fout, "%s\n", lines[i]);
+        free(lines[i]);
+    }
+    fclose(fout);
+    free(lines);
+
     return 0;
 }
