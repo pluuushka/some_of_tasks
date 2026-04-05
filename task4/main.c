@@ -19,13 +19,12 @@ int main(int argc, char **argv)
     }
 
     int count = argc - 1;
-    char s[count];
+    char* s[count];
     for (int i = 0; i < count; ++i)
     {
         s[i] = argv[i + 1];
     }
 
-
-
+    return 0;
 
 }
